@@ -1,0 +1,90 @@
+<head>
+    <link rel="stylesheet" href="/static/index.css">
+    <link rel="stylesheet" href="/static/micromodal.css">
+    <link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div id="background"></div>
+    
+
+    <h1 style="margin-top:10px">
+        <center>
+            <span aria-label="Sensors offline..." data-balloon-pos="down" id="error"><i class="fa-solid fa-circle-exclamation"  ></i></span>
+            GC Hive Data
+        </center>
+    </h1>
+    <center>Data taken from the hive</center>
+    <span id="loader"></span>
+    <div id="data-feed-info"></div>
+
+    <div class="button" id="dataButton">
+        <div id="dataButton-text">Advanced <i class="fa-solid fa-chevron-right"></i></div>
+        <div id="dataButton-content"></div>
+    </div>
+    <button class="button" id="resetButton">Reset zoom/pan</button>
+    <div id="tip">Use <kbd>Shift</kbd> and scroll on a graph to zoom. Drag to pan</div>
+    
+    <div class="graph-container">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+    <div class="graph-container">
+        <canvas id="humidityChart"></canvas>
+    </div>
+    <div class="graph-container">
+        <canvas id="pressureChart"></canvas>
+    </div>
+    <div class="graph-container">
+        <canvas id="resistanceChart"></canvas>
+    </div>
+    
+    <div style="margin-top:15px;float:left;width:100%"><center>The feed: all data is listed here in full</center></div>
+    <div id="data-feed"></div>
+    
+    <div class="modal micromodal-slide noselect" id="modal-1" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+                <div id="modal-background"></div>
+                <span class="modal__close" data-micromodal-close><i class="fa-solid fa-xmark"></i></span>
+                <div class="modal-content">
+                    <div id="dataUsage" class="noselect" data-tilt data-tilt-axis="x">
+                        <h1 style="margin-top:10px">Data Usage</h1>
+                        <h3>Last reset: <span id="last-reset">0</span></h3>
+                        <h3>Total requests sent: <span id="total-requests">0</span></h3>
+                        <h3>Total data usage: <span id="total-data">0</span></h3>
+                    </div>
+                    <div id="admin" class="admin noselect" data-tilt data-tilt-axis="x">
+                        <h1 class="admin" style="margin-top:10px">Admin</h1>
+                        <i class="fa-solid fa-chevron-up admin" id="adminChevron"></i>
+                        <div class="admin" id="adminContent">
+                            <button class="button" id="resetLogsButton">Reset logs</button>
+                            <button class="button" id="clearMemoryButton">Clear memory</button>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+    <div class="modal micromodal-slide noselect" id="modal-2" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="password-modal" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+                <div id="modal-background"></div>
+                <input id="adminPassword" placeholder="Enter administrator password" type="password" class="input horizontal-center" style="top:30px;position:absolute;width:300px;">
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+<script src="/static/micromodal.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
+<script src="https://cdn.socket.io/4.5.3/socket.io.min.js" integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi" crossorigin="anonymous"></script>
+<script src="/static/funcs.js"></script>
+<script src="/static/index.js"></script>
+<script src="/static/charts.js"></script>
