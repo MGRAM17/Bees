@@ -10,6 +10,8 @@ There are two different programs here, each in their own respective folder:
  
  ### Subscriber
  
+ (a demonstration of this can be seen on the [repl](https://subscriber.matthewingram.repl.co/))
+ 
  This is a webserver dashboard which reads data coming from the publisher and displays it with charts and tables. The subscriber is also used to monitor data usage and communicate to and from the publisher.
  
  ## Environmental variables
