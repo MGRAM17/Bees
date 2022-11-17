@@ -25,11 +25,10 @@ if use_sensors:
 HEADER_SIZE = 20
 
 # broker details - for security these are hidden and need to be included for code to work
-mqttbroker = os.getenv("mqqtbroker")
-mqttport = os.getenv("mqttport")
+mqttbroker = os.getenv("mqttbroker")
+mqttport = int(os.getenv("mqttport"))
 mqttuser = os.getenv("mqttuser")
 mqttpwd = os.getenv("mqttpwd")
-PASSWORD = os.getenv("password")
 
 DATA_TOPIC = "gc-hive/data"
 STATS_TOPIC = "gc-hive/stats"
@@ -82,8 +81,6 @@ def publish_stats(client : paho.Client):
     # [last_reset, total_requests, total_byte_usage]
     jsonstr = json.dumps([logs["last_reset"], logs["total_requests"], logs["total_byte_usage"]])
     packet_size = sys.getsizeof(jsonstr) + HEADER_SIZE 
-    
-    
 
     result = client.publish(topic=STATS_TOPIC, payload=jsonstr, qos=0, retain=False)
     
@@ -99,6 +96,16 @@ def publish_data(client : paho.Client, temperature, pressure, humidity, resistan
     # [time, temperature, pressure, humidity, resistance]
     data = [temperature, pressure, humidity, resistance]
     print("D", data)
+
+    if not os.path.exists("data.json"):
+        with open("data.json", "w") as f:
+            f.write('[]')
+    
+    with open("data.json") as f:
+        data_logs : list = json.load(f)
+    data_logs.append([datetime.now().isoformat()] + data)
+    with open("data.json", "w") as f:
+        json.dump(data_logs, f, indent=4)
             
     jsonstr = json.dumps(data)
 
