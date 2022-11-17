@@ -17,6 +17,9 @@ import datetime
 
 import flask_socketio
 
+# Replit db for storing values if on repl.it
+from replit import db 
+
 # broker details - for security these are hidden and need to be included for code to work
 mqttbroker = os.getenv("mqttbroker")
 mqttport = int(os.getenv("mqttport"))
@@ -36,7 +39,8 @@ def request_stats(client : paho.Client):
 def reset_stats(client : paho.Client):
     client.publish(topic=STATS_TOPIC, payload="reset", qos=2, retain=False)
 
-all_bee_data_compressed : typing.List[typing.List[typing.Union[str, float]]] = []
+# If on ReplIt, use their DB system to hold information. Otherwise initialise new list
+all_bee_data_compressed : typing.List[typing.List[typing.Union[str, float]]] = list(list(d) for d in db["data"]) if db and "data" in db else []
 stats_recieved : typing.List[typing.Union[str, int]] = []
 last_message : datetime.datetime = datetime.datetime.now()
 
@@ -64,6 +68,14 @@ def on_message(client, userdata, msg : mqtt_client.MQTTMessage):
         all_bee_data_compressed.append(d)
 
         socketio.emit("data", "new")
+
+        # If on ReplIt, use their DB system to hold information
+        try:
+            if "data" not in db:
+                db["data"] = []
+            db["data"] = list(db["data"]) + [d]
+        except:
+            pass
 
 # using MQTT version 5 here, for 3.1.1: MQTTv311, 3.1: MQTTv31
 # userdata is user defined data of any type, updated by user_data_set()
