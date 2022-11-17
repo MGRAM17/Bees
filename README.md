@@ -37,3 +37,4 @@ password="webserver password here (not required with the publisher)"
  
  - [Flask](https://pypi.org/project/Flask/) (`pip install Flask`)
  - [paho-mqtt](https://pypi.org/project/paho-mqtt/) (`pip install paho-mqtt`)
+ - [replit](https://pypi.org/project/paho-mqtt/) (`pip install replit`)
