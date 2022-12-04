@@ -3,7 +3,7 @@ var myChart = null
 
 charts = {}
 
-async function generate_time_chart(data, element) {  
+async function generate_time_chart(data, element, symbol, min, max) {  
     if (charts[element.id]) {
         charts[element.id].config.data = {datasets:data}
         charts[element.id].update()
@@ -16,6 +16,7 @@ async function generate_time_chart(data, element) {
             datasets: data,
         },
         options: {
+            
             responsive: true,
             maintainAspectRatio: false,
             tension:0.2,
@@ -27,6 +28,10 @@ async function generate_time_chart(data, element) {
             scales: {
                 xAxis: {
                     type: 'time',
+                },
+                yAxes: {
+                    min: min,
+                    max: max
                 }
             },
             animation: {
@@ -51,6 +56,14 @@ async function generate_time_chart(data, element) {
                         },
                         mode: 'x',
                         scaleMode: 'y'
+                    }
+                },
+                tooltip: {
+                    yAlign: 'bottom',
+                    callbacks: {
+                      label(tooltipItems) {
+                        return `${tooltipItems.formattedValue}${symbol}`
+                      }
                     }
                 }
             }
@@ -100,7 +113,8 @@ async function draw_tables() {
                 trendlineLinear: trendline
             }
         ],
-        document.getElementById('temperatureChart')
+        document.getElementById('temperatureChart'),
+        "℃"
     )
 
     await generate_time_chart([
@@ -111,7 +125,8 @@ async function draw_tables() {
                 trendlineLinear: trendline
             }
         ],
-        document.getElementById('humidityChart')
+        document.getElementById('humidityChart'),
+        "%"
     )
 
     await generate_time_chart([
@@ -121,7 +136,8 @@ async function draw_tables() {
                 borderColor:"green"
             }
         ],
-        document.getElementById('pressureChart')
+        document.getElementById('pressureChart'),
+        "hPa"
     )
 
     await generate_time_chart([
@@ -131,7 +147,8 @@ async function draw_tables() {
                 borderColor:"purple"
             }
         ],
-        document.getElementById('resistanceChart')
+        document.getElementById('resistanceChart'),
+        "Ω"
     )
 
 }

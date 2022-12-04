@@ -6,24 +6,26 @@
 </head>
 <body>
     <div id="background"></div>
-    
 
-    <h1 style="margin-top:10px">
-        <center>
-            <span aria-label="Sensors offline..." data-balloon-pos="down" id="error"><i class="fa-solid fa-circle-exclamation"  ></i></span>
-            GC Hive Data
-        </center>
-    </h1>
-    <center>Data taken from the hive</center>
-    <span id="loader"></span>
-    <div id="data-feed-info"></div>
-
-    <div class="button" id="dataButton">
-        <div id="dataButton-text">Advanced <i class="fa-solid fa-chevron-right"></i></div>
-        <div id="dataButton-content"></div>
+    <div id="header">
+        <h1 style="margin-top:10px">
+            <center>
+                <span aria-label="Sensors offline..." data-balloon-pos="down" id="error"><i class="fa-solid fa-circle-exclamation"  ></i></span>
+                GC Hive Data
+            </center>
+        </h1>
+        <center>Data taken from the hive</center>
+        <span id="loader"></span>
+        <center><h3 id="data-feed-info"></h3></center>
+        <div class="header-button" id="dataButton" style="left:-2px;border-radius:10px 0 0 10px;">
+            <div id="dataButton-text" class="all-center">Advanced <i class="fa-solid fa-chevron-right"></i></div>
+            <div id="dataButton-content"></div>
+        </div>
+        <div class="header-button" id="resetButton" style="right:-2px;border-radius:0 10px 10px 0;"><div class="all-center">Reset pan</div></div>
+        <div id="tip">Use <kbd>Shift</kbd> and scroll on a graph to zoom. Drag to pan</div>
     </div>
-    <button class="button" id="resetButton">Reset zoom/pan</button>
-    <div id="tip">Use <kbd>Shift</kbd> and scroll on a graph to zoom. Drag to pan</div>
+
+    
     
     <div class="graph-container">
         <canvas id="temperatureChart"></canvas>
@@ -48,18 +50,33 @@
                 <span class="modal__close" data-micromodal-close><i class="fa-solid fa-xmark"></i></span>
                 <div class="modal-content">
                     <div id="dataUsage" class="noselect" data-tilt data-tilt-axis="x">
-                        <h1 style="margin-top:10px">Data Usage</h1>
-                        <h3>Last reset: <span id="last-reset">0</span></h3>
-                        <h3>Total requests sent: <span id="total-requests">0</span></h3>
-                        <h3>Total data usage: <span id="total-data">0</span></h3>
+                        <h1 style="margin-top:10px"><i class="fa-solid fa-globe"></i> Data Usage</h1>
+                        <h3>Last reset: <span id="last-reset">Fetching from sensors</span></h3>
+                        <h3>Total requests sent: <span id="total-requests">Fetching from sensors</span></h3>
+                        <h3>Total data usage: <span id="total-data">Fetching from sensors</span></h3>
                     </div>
+                    
                     <div id="admin" class="admin noselect" data-tilt data-tilt-axis="x">
-                        <h1 class="admin" style="margin-top:10px">Admin</h1>
+                        <h1 class="admin" style="margin-top:10px"><i class="fa-solid fa-lock"></i> Admin</h1>
                         <i class="fa-solid fa-chevron-up admin" id="adminChevron"></i>
                         <div class="admin" id="adminContent">
                             <button class="button" id="resetLogsButton">Reset logs</button>
                             <button class="button" id="clearMemoryButton">Clear memory</button>
+                            <button class="button" id="enableDesktopButton">Enable Desktop</button>
+                            <button class="button" id="disableDesktopButton">Disable Desktop</button>
+                            <button class="button" id="rebootButton">Reboot sensor</button>
+                            <div id="gui" style="margin-top:15px"></div>
                         </div>
+                    </div>
+                    <div id="filters" class="noselect" data-tilt data-tilt-axis="x">
+                        <h1 style="margin-top:10px"><i class="fa-solid fa-filter"></i> Filters</h1>
+                        <button class="button" id="filters-reset"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                        <h3>Start time</h3>
+                        <input type="datetime-local" id="filter-start" class="input">
+                        <h3>Finish time</h3>
+                        <input type="datetime-local" id="filter-finish" class="input">
+                        <h3>Resolution</h3>
+                        Every <span><input type="number" id="filter-resolution" class="input" style="width:50px;padding:0;"></span> data points
                     </div>
                 </div>
 

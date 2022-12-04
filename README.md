@@ -32,6 +32,7 @@ password="webserver password here (not required with the publisher)"
  
  - [bme680](https://pypi.org/project/bme680/) (`pip install bme680`)
  - [paho-mqtt](https://pypi.org/project/paho-mqtt/) (`pip install paho-mqtt`)
+ - [python-dotenv](https://pypi.org/project/python-dotenv/) (`pip install python-dotenv`)
  
   ### Susbcriber
  

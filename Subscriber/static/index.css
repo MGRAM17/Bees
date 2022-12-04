@@ -7,6 +7,7 @@
     --c3:#FFFF99;
     --c4:#FFC478;
     --c5:#734330;
+    --c6:#ffe2a3;
 }
 
 body {
@@ -52,6 +53,35 @@ body {
                                     supported by Chrome, Edge, Opera and Firefox */
 }
 
+#header {
+    margin:12px 0 0 12px;
+    height:150px;
+    width:calc(100% - 34px);
+    border-radius:10px;
+    background-color:var(--c6);
+    box-shadow: rgb(0, 0, 0, 0.2) 0 0 10px;
+    border: 2px solid #814B36;
+    position:relative
+}
+.header-button {
+    height:150px;
+    position:absolute;
+    width:200px;
+    border: 2px solid #814B36;
+    cursor:pointer;
+    top:-2px;
+    background-color:#814B3650
+}
+.header-button:hover {
+    background-color:#FFFFFF50
+}
+
+#filters-reset {
+    top:20px;
+    right:20px;
+    position:absolute
+}
+
 #background {
     background-image: url(/static/background.png);
     background-size:150%;
@@ -73,6 +103,20 @@ body {
     box-sizing: border-box; 
     backdrop-filter: blur(10px);
     
+}
+#filters {
+    
+    width:calc(50% - 25px);
+    border-radius:5px;
+    background-color:#DDD8A650;
+    box-shadow: rgb(0, 0, 0, 0.2) 0 0 10px;
+    border: 2px solid #814B36;
+    padding:10px;
+    box-sizing: border-box; 
+    backdrop-filter: blur(10px);
+    position:absolute;
+    left:12px;
+    top:270px;
 }
 #admin {
     margin:12px 0 0 12px;
@@ -128,7 +172,7 @@ body {
     height:500px;
     width:calc(100% - 20px);
     border-radius:5px;
-    background-color:var(--c4);
+    background-color:var(--c6);
     float:left;
     box-shadow: rgb(0, 0, 0, 0.2) 0 0 10px;
     border: 2px solid #814B36
@@ -168,8 +212,8 @@ body {
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
     position:absolute;
-    top:15px;
-    left:165px;
+    top:calc(50% - 24px);
+    left:calc(50% - 200px);
     box-shadow: rgb(0, 0, 0, 0.2) 0 0 10px;
 }
 
@@ -233,26 +277,20 @@ body {
     transition: all 0.25s;
 }
 
-#resetButton {
-    position:absolute;
-    top:15px;
-    right:15px
-}
-#dataButton {
-    position:absolute;
-    top:15px;
-    left:15px
-}
+
 
 #tip {
     position:absolute;
-    right:15px;
-    top:60px;
-    background-color:#FFF2D6;
-    padding:2px 4px 2px 5px;
-    border-radius:4px;
-    border:2px solid #FFDCAD;
-    box-shadow: 2px 2px 3px rgb(0, 0, 0, 0.3)
+    right:200px;
+    height:150px;
+    top:0;
+    box-sizing: border-box; 
+    width:100px;
+    font-family: Nunito;
+    border-left:2px solid #814B36;
+    padding:10px;
+    cursor:default;
+    
 }
 
 @keyframes rotation {

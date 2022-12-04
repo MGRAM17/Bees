@@ -16,6 +16,9 @@ $('#dataUsage').tilt({
 $('#admin').tilt({
     maxTilt: 2
 })
+$('#filters').tilt({
+    maxTilt: 2
+})
 
 refresh_interval = 60
 document.getElementById("data-feed-info").innerText = `Feed refreshes every ${refresh_interval} seconds`
@@ -23,6 +26,7 @@ document.getElementById("data-feed-info").innerText = `Feed refreshes every ${re
 // {"time":time, "temperature":temperature, "pressure":pressure, "humidity":humidity}
 bee_datas = []
 stats = {}
+prev_data = []
 
 data_feed = document.getElementById("data-feed")
 data_button = document.getElementById("dataButton")
@@ -31,28 +35,64 @@ admin = document.getElementById("admin")
 reset_logs_button = document.getElementById("resetLogsButton")
 admin_password = document.getElementById("adminPassword")
 clear_memory_button = document.getElementById("clearMemoryButton")
+enable_desktop_button = document.getElementById("enableDesktopButton")
+disable_desktop_button = document.getElementById("disableDesktopButton")
+reboot_button = document.getElementById("rebootButton")
 
 background = document.getElementById("background")
 modal_background = document.getElementById("modal-background")
 loader = document.getElementById("loader")
+filter_start = document.getElementById("filter-start")
+filter_finish = document.getElementById("filter-finish")
+filters_reset = document.getElementById("filters-reset")
+filter_resolution = document.getElementById("filter-resolution")
 
-async function refresh_data() {
-    r = await fetch("/api/data")
-    j = await r.json()
+var start
+var finish
+var resolution
 
-    data = j.data
+default_resolution = 1
 
-    if (j.error) {
-        document.getElementById("error").style.display = "inline-block"
-        document.getElementById("error").setAttribute("aria-label", j.message)
+async function refresh_data(inp_data) {
+    
+    if (!inp_data) {
+        
+        if (resolution) {
+            every = resolution
+        } else {
+            every = "auto"
+        }
+
+        params = `every=${every}`
+        if (start) {
+            params += `&start=${formatDate(start)}`
+        } if (finish) {
+            params += `&finish=${formatDate(finish)}`
+        }
+
+        r = await fetch(`/api/data?${params}`)
+        j = await r.json()
+
+        data = j.data
+        default_resolution = j.every
+        prev_data = data
+
+        if (j.error) {
+            document.getElementById("error").style.display = "inline-block"
+            document.getElementById("error").setAttribute("aria-label", j.message)
+        } else {
+            document.getElementById("error").style.display = "none"
+        }
     } else {
+        data = inp_data
         document.getElementById("error").style.display = "none"
     }
+
     
-    
-    if (data.length > 0 && bee_datas.length == data.length) {
+    if (data.length > 0 && !inp_data && bee_datas.length == data.length) {
         return
     }
+    
     stats = {}
 
     // [time, temp, pressure, humidity, resistance]
@@ -60,7 +100,15 @@ async function refresh_data() {
     for (item of data) {
         bee_datas.push({time:item[0], temperature:item[1], pressure:item[2], humidity:item[3], resistance:item[4]})
     }
-    console.log(bee_datas)
+    if (bee_datas.length > 0 && !start) {
+        var d = new Date(bee_datas[0].time);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+        filter_start.value = d.toISOString().slice(0,16);
+    }
+    if (!resolution) {
+        filter_resolution.value = default_resolution
+    }
+    
 
     data_feed.innerHTML = ""
 
@@ -72,6 +120,42 @@ async function refresh_data() {
         data_feed.innerHTML += item
     }
     await draw_tables()
+}
+
+filters_reset.onclick = async function() {
+    
+    start = null 
+    finish = null
+    resolution = null
+    
+    var d = new Date(prev_data[0][0]);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    filter_start.value = ""
+    filter_finish.value = ""
+    
+
+    await refresh_data()
+}
+
+resolution_counter = null
+
+filter_start.onchange = async function(e) {
+    start = new Date(e.target.value)
+    await refresh_data()
+}
+filter_finish.onchange = async function(e) {
+    finish = new Date(e.target.value)
+    await refresh_data()
+}
+filter_resolution.oninput = async function(e) {
+    clearTimeout(resolution_counter)
+
+    resolution_counter = setTimeout(async function() {
+        resolution = filter_resolution.value 
+        await refresh_data()
+    }, 1000)
+    
+    
 }
 
 async function resize() {
@@ -164,6 +248,55 @@ clear_memory_button.onclick = async function() {
     loader.style.display = "none"
     await refresh_data()
 }
+enable_desktop_button.onclick = async function() {
+    loader.style.display = "inline-block"
+    r = await fetch(`/api/enable_desktop?pwd=${encodeURIComponent(admin_password.value)}`, {method: 'GET'})
+    data = await r.json()
+
+    if (data.error) {
+        nt = await notifications.new("Error", data.message)
+        nt.style.backgroundColor = "rgb(255, 0, 0, 0.2)"
+    } else {
+        nt = await notifications.new("Successfully enabled", data.message)
+        nt.style.backgroundColor = "rgb(0, 255, 0, 0.2)"
+        stats[3] = "desktop"
+        updateStats()
+    }
+    loader.style.display = "none"
+    
+}
+disable_desktop_button.onclick = async function() {
+    loader.style.display = "inline-block"
+    r = await fetch(`/api/disable_desktop?pwd=${encodeURIComponent(admin_password.value)}`, {method: 'GET'})
+    data = await r.json()
+
+    if (data.error) {
+        nt = await notifications.new("Error", data.message)
+        nt.style.backgroundColor = "rgb(255, 0, 0, 0.2)"
+    }  else {
+        nt = await notifications.new("Successfully disabled", data.message)
+        nt.style.backgroundColor = "rgb(0, 255, 0, 0.2)"
+        stats[3] = "terminal"
+        updateStats()
+    }
+
+    loader.style.display = "none"
+}
+reboot_button.onclick = async function() {
+    loader.style.display = "inline-block"
+    r = await fetch(`/api/reboot?pwd=${encodeURIComponent(admin_password.value)}`, {method: 'GET'})
+    data = await r.json()
+
+    if (data.error) {
+        nt = await notifications.new("Error", data.message)
+        nt.style.backgroundColor = "rgb(255, 0, 0, 0.2)"
+    } else {
+        nt = await notifications.new("Successfully rebooted", data.message)
+        nt.style.backgroundColor = "rgb(0, 255, 0, 0.2)"
+    }
+
+    loader.style.display = "none"
+}
 
 async function updateStats() {
     document.getElementById("total-data").innerText = formatFileSize(stats[2], 2)
@@ -171,10 +304,19 @@ async function updateStats() {
 
     last_reset = new Date(stats[0]);
     document.getElementById("last-reset").innerText = `${ordinal_suffix_of(last_reset.getDate())} ${monthNames[last_reset.getMonth()]} ${last_reset.getFullYear()} at ${last_reset.getHours()}:${last_reset.getMinutes()}`
-
+    document.getElementById("gui").innerText = `The computer is currently in ${stats[3]} mode.`
+    if (stats[3] == "desktop") {
+        enable_desktop_button.style.filter = "brightness(80%)"
+        disable_desktop_button.style.filter = "brightness(100%)"
+    } else {
+        enable_desktop_button.style.filter = "brightness(100%)"
+        disable_desktop_button.style.filter = "brightness(80%)"
+    }
 }
 
 data_button.onclick = async function() {
+    MicroModal.show('modal-1');
+
     if (Object.keys(stats).length === 0) {
         loader.style.display = "inline-block"
         r = await fetch("/api/stats")
@@ -191,13 +333,11 @@ data_button.onclick = async function() {
             stats = data.data
             updateStats()
             document.getElementById("error").style.display = "none"
-            MicroModal.show('modal-1');
         }
 
         loader.style.display = "none"
     } else {
         updateStats()
-        MicroModal.show('modal-1');
     }
 
     
@@ -215,12 +355,20 @@ socket.on('data', async function(msg) {
         await refresh_data()
     }
 })
+socket.on('errors', async function(msg) {
+    document.getElementById("error").style.display = "inline-block"
+    document.getElementById("error").setAttribute("aria-label", msg)
+})
 
 window.onresize = resize 
 resize()
 
-window.onload = refresh_data 
+window.onload = async function() {
+    await refresh_data()
+} 
 
-setInterval(refresh_data, refresh_interval * 1000)
+setInterval(async function() {
+    await refresh_data()
+} , refresh_interval * 1000)
 
 
